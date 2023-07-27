@@ -1,5 +1,5 @@
 {
-  "name": "@idealjs/mono-template-core",
+  "name": "@idealjs/jellyfish-core",
   "version": "1.0.0",
   "type": "module",
   "types": "./dist/index.d.ts",
