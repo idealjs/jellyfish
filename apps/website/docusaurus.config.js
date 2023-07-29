@@ -7,7 +7,7 @@ const path = require("path");
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "My Site",
+  title: "Jellyfish",
   tagline: "Dinosaurs are cool",
   favicon: "img/favicon.ico",
 
@@ -58,9 +58,9 @@ const config = {
       // Replace with your project's social card
       image: "img/docusaurus-social-card.jpg",
       navbar: {
-        title: "My Site",
+        title: "Jellyfish",
         logo: {
-          alt: "My Site Logo",
+          alt: "Jellyfish Logo",
           src: "img/logo.svg",
         },
         items: [
