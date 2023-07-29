@@ -14,5 +14,5 @@
       "@idealjs/jellyfish-core": ["../../packages/core/src/index.ts"]
     }
   },
-  "include": ["**/*.tsx", "../../packages/core/src/index.ts"]
+  "include": ["**/*.tsx", "../../packages/core"]
 }
