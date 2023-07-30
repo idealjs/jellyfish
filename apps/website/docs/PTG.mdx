@@ -1,10 +1,14 @@
 # PTG
 
-import { PTG, sphereShape, squareShape } from "@idealjs/ptg";
+import PTGDemo from "./components/PTGDemo";
 
-<PTG width={500} height={500} noiseSeed={0} shape={sphereShape} />
+<PTGDemo />
 
 import CodeBlock from "@theme/CodeBlock";
+import PTGDemoContent from "!!raw-loader!./components/PTGDemo";
+
+<CodeBlock language="tsx">{PTGDemoContent}</CodeBlock>
+
 import Content from "!!raw-loader!../../../packages/ptg/src/components/PTG";
 
 <CodeBlock language="tsx">{Content}</CodeBlock>

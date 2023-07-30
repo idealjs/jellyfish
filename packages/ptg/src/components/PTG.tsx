@@ -1,9 +1,10 @@
 import type P5 from "p5";
 import { Vector } from "p5";
-import React, { useCallback } from "react";
-import Sketch from "react-p5";
+import React, { lazy, useCallback } from "react";
 
 import { VoronoiDiagram } from "../utils/voronio";
+
+const Sketch = lazy(() => import("react-p5"));
 
 const createSetup =
   (params: { height: number; width: number }) =>
