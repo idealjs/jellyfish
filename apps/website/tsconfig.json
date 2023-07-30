@@ -13,8 +13,9 @@
     "baseUrl": ".",
     "paths": {
       "@site/*": ["./*"],
-      "@idealjs/jellyfish-core": ["../../packages/core/src/index.ts"]
+      "@idealjs/jellyfish-core": ["../../packages/core/src/index.ts"],
+      "@idealjs/ptg": ["../../packages/ptg/src/index.ts"]
     }
   },
-  "include": ["**/*.tsx", "../../packages/core/src"]
+  "include": ["**/*.tsx", "../../packages/core/src", "../../packages/ptg/src"]
 }
