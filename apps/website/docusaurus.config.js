@@ -118,6 +118,10 @@ const config = {
                   __dirname,
                   "../../packages/core/src/index.ts"
                 ),
+                "@idealjs/ptg": path.resolve(
+                  __dirname,
+                  "../../packages/ptg/src/index.ts"
+                ),
               },
             },
           };
