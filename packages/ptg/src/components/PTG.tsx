@@ -2,7 +2,7 @@ import type P5 from "p5";
 import { Vector } from "p5";
 import React, { lazy, useCallback } from "react";
 
-import { VoronoiDiagram } from "../utils/voronio";
+import { VoronoiCell, VoronoiDiagram } from "../utils/voronio";
 
 const Sketch = lazy(() => import("react-p5"));
 
@@ -59,14 +59,38 @@ const createDraw =
       return img;
     };
 
+    const getSharedEdge = (
+      p5: any,
+      cell1: VoronoiCell,
+      cell2: VoronoiCell
+    ): Vector[] | null => {
+      // Convert polygon vertices to string representation for comparison
+      const cell1Edges = cell1.polygon.map((v) => `${v.x},${v.y}`);
+      const cell2Edges = cell2.polygon.map((v) => `${v.x},${v.y}`);
+
+      // Find common edges
+      const sharedEdges = cell1Edges.filter((edge) =>
+        cell2Edges.includes(edge)
+      );
+
+      // If there are exactly two shared edges, return them as Vectors
+      if (sharedEdges.length > 0) {
+        return sharedEdges.map((edge) => {
+          const [x, y] = edge.split(",").map(Number);
+          return p5.createVector(x, y);
+        });
+      }
+
+      // If there are not exactly two shared edges, return null
+      return null;
+    };
+
     const points: Vector[] = [];
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 10; i++) {
       points.push(
         p5.createVector(Math.random() * width, Math.random() * height)
       );
     }
-
-    const noiseMap = createNoiseMap({ scale: 0.005, width, height });
 
     const voronoi = new VoronoiDiagram(p5, points, 5, width, height);
     voronoi.cells.forEach((cell) => {
@@ -95,7 +119,41 @@ const createDraw =
       });
       p5.endShape(p5.CLOSE);
     });
-    // p5.image(noiseMap,0,0)
+
+    p5.fill(255, 0, 0); // Set the color of the circles (R,G,B)
+    for (const cell of voronoi.cells) {
+      p5.ellipse(cell.site.x, cell.site.y, 10, 10); // Draw a circle at the site position
+    }
+
+    // draw connections
+    p5.stroke(255, 0, 0); // Set the color of the lines (R,G,B)
+    for (const cell of voronoi.cells) {
+      if (cell.neighbors) {
+        for (const neighborIndex of cell.neighbors) {
+          const neighbor = voronoi.cells[neighborIndex];
+          p5.line(cell.site.x, cell.site.y, neighbor.site.x, neighbor.site.y);
+        }
+      }
+    }
+
+    for (let i = 0; i < voronoi.cells.length; i++) {
+      let cell = voronoi.cells[i];
+      if (cell.neighbors) {
+        for (let j = 0; j < cell.neighbors.length; j++) {
+          let neighborCell = voronoi.cells[cell.neighbors[j]];
+          const sharedEdge = getSharedEdge(p5,cell, neighborCell);
+          if (sharedEdge) {
+            p5.stroke(0, 0, 255); // Set stroke color to red for shared edges
+            p5.line(
+              sharedEdge[0].x,
+              sharedEdge[0].y,
+              sharedEdge[1].x,
+              sharedEdge[1].y
+            );
+          }
+        }
+      }
+    }
   };
 
 interface IProps {
