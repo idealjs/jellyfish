@@ -1,4 +1,9 @@
 # PTG
+PTG represents for Procedrual Terrain Generation
+In this example, we use the voronio diagram to generate cells with borduaries, and assign different cell to either water or land biomes.
+To make sure the shaped always surrounded by water, the boundary of the noise map will always be 0.
+Why not use noise map to generate shape directly? Coz we can't get clear coastline by only filter the noise map, no matter what kind of the map it is.
+Instead generate terrain using noise map and erosion algo to match the natural process as much as possible, we first define the final shape of the terrain, this way, the final result would be easier to control and more interesting to play in the game, compared to the real natural way.
 
 import PTGDemo from "./components/PTGDemo";
 
