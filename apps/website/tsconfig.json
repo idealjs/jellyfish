@@ -6,6 +6,7 @@
     "outDir": "dist",
     "jsx": "react",
     "types": [
+      "@types/wicg-file-system-access",
       "node",
       "@docusaurus/module-type-aliases",
       "@docusaurus/theme-classic"
