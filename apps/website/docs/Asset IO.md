@@ -1,10 +1,10 @@
-# Asset IO Engine
+# Asset IO
 
-External asset will come through the asset IO engine pipeline and becomes one or more engine friendly assets.
+External assets are processed through the Asset Input-Output (IO) Engine pipeline and transformed into one or more engine-compatible assets.
 
-For example, gltf file will becomes .texture, .animation, .skin, .mesh, .material assets, if this gltf contains embeded external file such as images, those images will be treated as external asset and again going through the pipeline
+For instance, a glTF file can be converted into .texture, .animation, .skin, .mesh, and .material assets. If the glTF file includes embedded external files such as images, these images are treated as external assets and processed through the pipeline again.
 
-After this process, the external asset will remain the same in the folder, but with an additional file ending with .meta which contains corresponding engine friendly asset data, this .meta file is the only source for engine to load assets from into the runtime scene. Inside engine editor, the external asset will be ignored and .meta file will be then shown as engine recognized asset
+After this conversion process, the original external asset remains unchanged in the folder. However, an additional .meta file is created, which contains corresponding engine-compatible asset data. This .meta file serves as the exclusive source for the engine to load assets into the runtime scene. Within the engine editor, the external asset is disregarded, and the .meta file is presented as an engine-recognized asset.
 
 ### About engine asset and its .meta file:
 
@@ -175,16 +175,59 @@ After this process, the external asset will remain the same in the folder, but w
 
 ### **About the asset IO engine pipeline:**
 
-The asset IO engine pipeline is a crucial part of the 3D engine. It is responsible for converting external assets into a format that the engine can easily use. This involves parsing the files, extracting the necessary data, and then saving this data in a new .meta file that the engine can read.
+The Asset IO Engine Pipeline is a fundamental component of a 3D engine. Its primary role is to transform external assets into a format that can be readily utilized by the engine. This transformation process involves parsing the original files, extracting necessary data, and subsequently storing this data in a new .meta file that the engine can interpret.
 
-The pipeline works as follows:
+The pipeline operates as follows:
 
-1. The pipeline takes an external asset file (e.g., a .gltf or .png file) as input.
-2. It parses the file, extracting the necessary data. For a .gltf file, this might involve extracting the mesh data, texture references, animations, and skinning information. For a .png file, this involves reading the image data.
-3. The extracted data is then converted into an engine-friendly format. This might involve converting the image data into a specific texture format, or converting the mesh data into a format that the engine's renderer can easily use.
-4. The converted data is then saved in a new .meta file. This file contains all the information the engine needs to use the asset, in a format that it can easily read.
-5. The .meta file is then used by the engine to load the asset into the runtime scene. The original external asset file is ignored by the engine; all it needs is the .meta file.
+1. **Input**: The pipeline accepts an external asset file (such as a .gltf or .png file) as its input.
+2. **Parsing**: The pipeline parses the input file and extracts the necessary data. For instance, parsing a .gltf file might involve extracting mesh data, texture references, animations, and skinning information. For a .png file, the pipeline would read the image data. Any external model file will eventually be converted to .prefab and .meta files.
+3. **Prefab Creation**: The .prefab file provides comprehensive details of the original glTF file, but in the form of an engine scene graph. This supports engine-specific features such as scripting. The .prefab and .scene files essentially share the same underlying structure.
+4. **Data Conversion**: The extracted data is then transformed into a format that is friendly to the engine. This could involve converting image data into a specific texture format or transforming mesh data into a format that can be easily used by the engine's renderer.
+5. **Meta File Creation**: The converted data is subsequently stored in a new .meta file. This file contains all the information the engine requires to use the asset, in a format that it can easily read and interpret.
+6. **Asset Loading**: The .meta file is then used by the engine to load the asset into the runtime scene. The engine disregards the original external asset file; all it requires is the .meta file.
 
-This pipeline ensures that the engine can efficiently load and use assets, regardless of their original format. It also allows for a high degree of flexibility, as the engine can support any asset format for which a parser can be written.
+This pipeline ensures that the engine can efficiently load and utilize assets, regardless of their original format. It also offers a high degree of flexibility, as the engine can support any asset format for which a parser can be written.
 
-[API](https://www.notion.so/API-5f75e4dca8f446a1b27e5d1bf4b80302?pvs=21)
+### glTF reminder:
+
+Process GLTF resources into a unified engine input, converting mesh, material, animation, etc. into engine classes. Binary data doesn't need to be changed. At this stage, it should be implemented such that the engine classes can correctly access and parse binary block data. The entire engine uses the ECS (Entity Component System) model. All classes must have an index corresponding to the binary data, which is stored in a database. Only when the data exists in the database, can it be referenced by the corresponding class.
+
+Example:
+
+```json
+{
+    "primitives": [
+        {
+            "attributes": {
+                "POSITION": 0,
+                "NORMAL": 1,
+                "TEXCOORD_0": 2,
+                "TEXCOORD_1": 3,
+                "TANGENT": 4,
+                "COLOR_0": 5,
+                "JOINTS_0": 6,
+                "WEIGHTS_0": 7
+            },
+            "indices": 8,
+            "material": 0,
+            "mode": 4,
+            "targets": [
+                {
+                    "POSITION": 9,
+                    "NORMAL": 10,
+                    "TANGENT": 11
+                },
+                {
+                    "POSITION": 12,
+                    "NORMAL": 13,
+                    "TANGENT": 14
+                }
+            ]
+        }
+    ]
+}
+```
+
+Here, each key corresponds to the accessor index. The final data for **`JOINTS_0`** and **`WEIGHTS_0`** is in matrix form. The lengths of these two arrays should be consistent. The information carried by the **`JOINTS_0`** matrix is the sequence number of the bone nodes affected by each primitive's vertex, which corresponds to the sequence number in the **`joints`** array of the glTF's skin.
+
+Breaking it down: A **`primitive`** corresponds to a file, equivalent to a 'mesh' in Unity. Each accessor's index will turn into an ID. The primitive itself also needs to have an ID for querying the path of the skin file in the glTF file. The 'skin' corresponds to a file where the **`joints`** array in the skin is the sequence number of nodes in the glTF file. Therefore, the skin also needs an ID to query the corresponding glTF node graph. The 'mesh' corresponds to a file, which is a 'gameobject' in Unity. The mesh includes the ID of the primitive. This ID can query the corresponding mesh file path.
