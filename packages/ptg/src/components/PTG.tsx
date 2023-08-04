@@ -27,15 +27,16 @@ const createDraw =
   }) =>
   (p5: P5) => {
     const { shape, noiseSeed, width, height } = params;
-    const noiseShape = (params: {
+    const getCellType = (params: {
       height: number;
       width: number;
       x: number;
       y: number;
       scale: number;
+      seed: number;
     }) => {
-      const { width, height, x, y, scale } = params;
-      // p5.noiseSeed(noiseSeed)
+      const { width, height, x, y, scale, seed } = params;
+      p5.noiseSeed(seed);
       const value = p5.noise(x * scale, y * scale);
       return value > 0.4 && shape({ width, height, x, y });
     };
@@ -95,18 +96,19 @@ const createDraw =
     const voronoi = new VoronoiDiagram(p5, points, 5, width, height);
     voronoi.cells.forEach((cell) => {
       let centroid = {
-        x: cell.polygon.reduce((sum, v) => sum + v.x, 0) / cell.polygon.length,
-        y: cell.polygon.reduce((sum, v) => sum + v.y, 0) / cell.polygon.length,
+        x: cell.site.x,
+        y: cell.site.y,
       };
 
       // Decide whether or not to color the cell
       if (
-        noiseShape({
+        getCellType({
           width,
           height,
           x: centroid.x,
           y: centroid.y,
           scale: 0.006,
+          seed: 0,
         })
       ) {
         p5.fill(177, 166, 148); // Color the cell green
@@ -141,8 +143,27 @@ const createDraw =
       if (cell.neighbors) {
         for (let j = 0; j < cell.neighbors.length; j++) {
           let neighborCell = voronoi.cells[cell.neighbors[j]];
-          const sharedEdge = getSharedEdge(p5,cell, neighborCell);
-          if (sharedEdge) {
+          const sharedEdge = getSharedEdge(p5, cell, neighborCell);
+          const isDifferentType =
+            getCellType({
+              width,
+              height,
+              x: cell.site.x,
+              y: cell.site.y,
+              scale: 0.006,
+              seed: 0,
+            }) !==
+            getCellType({
+              width,
+              height,
+              x: neighborCell.site.x,
+              y: neighborCell.site.y,
+              scale: 0.006,
+              seed: 0,
+            });
+
+          if (sharedEdge && isDifferentType) {
+            p5.strokeWeight(3); // Set stroke weight to 2 pixels
             p5.stroke(0, 0, 255); // Set stroke color to red for shared edges
             p5.line(
               sharedEdge[0].x,
